@@ -16,7 +16,7 @@ Allow users to set a default style for their posts/messages.
 4. __Enjoy!__
 
 ### Update
-#### 1.0 to 1.1
+##### 1.0 to 1.1
 1. Deactivate/Uninstall old plugin (plugin data will get lost).
 2. Follow "Installation" instructions.
 
