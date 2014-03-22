@@ -2,9 +2,9 @@
 
 /***************************************************************************
  *
- *   OUGC Default Post Style plugin
+ *   OUGC Default Post Style plugin (/inc/plugins/ougc_defaultpoststyle.php)
  *	 Author: Omar Gonzalez
- *   Copyright: © 2012 Omar Gonzalez
+ *   Copyright: Â© 2012-2014 Omar Gonzalez
  *   
  *   Website: http://omarg.me
  *
@@ -30,73 +30,120 @@
 // Die if IN_MYBB is not defined, for security reasons.
 defined('IN_MYBB') or die('This file cannot be accessed directly.');
 
-// Run our hook.
-if(!defined('IN_ADMINCP'))
+// Run/Add Hooks
+if(defined('IN_ADMINCP'))
+{
+	$plugins->add_hook('admin_config_settings_start', 'ougc_defaultpoststyle_lang_load');
+	$plugins->add_hook('admin_style_templates_set', 'ougc_defaultpoststyle_lang_load');
+	$plugins->add_hook('admin_config_settings_change', 'ougc_defaultpoststyle_settings_change');
+}
+else
 {
 	global $plugins, $mybb;
-	define('OUGC_DPS', '{POST_CONTENT}');
 
 	$plugins->add_hook('usercp_menu_built', 'ougc_defaultpoststyle_menu');
 	$plugins->add_hook('usercp_start', 'ougc_defaultpoststyle_usercp');
 
-	// Now, where should we use this...?
-	$plugins->add_hook('newreply_do_newreply_start', 'ougc_defaultpoststyle_default');
-	$plugins->add_hook('newthread_do_newthread_start', 'ougc_defaultpoststyle_default');
-	$plugins->add_hook('private_send_do_send', 'ougc_defaultpoststyle_default');
-	$plugins->add_hook('calendar_do_addevent_start', 'ougc_defaultpoststyle_default');
-	$plugins->add_hook('comment_download_start', 'ougc_defaultpoststyle_default');
+	$plugins->add_hook('newreply_do_newreply_start', 'ougc_defaultpoststyle_run');
+	$plugins->add_hook('newthread_do_newthread_start', 'ougc_defaultpoststyle_run');
+	$plugins->add_hook('private_send_do_send', 'ougc_defaultpoststyle_run');
+	$plugins->add_hook('calendar_do_addevent_start', 'ougc_defaultpoststyle_run');
+	$plugins->add_hook('comment_download_start', 'ougc_defaultpoststyle_run');
 
 	if(in_array(THIS_SCRIPT, array('usercp.php', 'usercp2.php', 'private.php')))
 	{
 		global $templatelist;
 
-		if(isset($templatelist))
+		if(!isset($templatelist))
+		{
+			$templatelist = '';
+		}
+		else
 		{
 			$templatelist .= ',';
 		}
+
 		$templatelist .= 'ougc_defaultpoststyle_menu';
 
 		if($mybb->input['action'] == 'defaultpoststyle')
 		{
-			$templatelist .= ', ougc_defaultpoststyle, ougc_defaultpoststyle_preview, smilieinsert_getmore, smilieinsert, codebuttons';
+			$templatelist .= ',ougc_defaultpoststyle,ougc_defaultpoststyle_preview,ougc_defaultpoststyle_newpoints, smilieinsert_getmore,smilieinsert,codebuttons';
 		}
 	}
 }
 
-//Necessary plugin information for the ACP plugin manager.
+// PLUGINLIBRARY
+defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', MYBB_ROOT.'inc/plugins/pluginlibrary.php');
+
+// Plugin API
 function ougc_defaultpoststyle_info()
 {
 	global $lang;
-	isset($lang->ougc_defaultpoststyle) or $lang->load('ougc_defaultpoststyle');
+	ougc_defaultpoststyle_lang_load();
 
 	return array(
 		'name'			=> 'OUGC Default Post Style',
-		'description'	=> $lang->ougc_defaultpoststyle_d,
-		'website'		=> 'http://udezain.com.ar/',
+		'description'	=> $lang->setting_group_ougc_defaultpoststyle_desc,
+		'website'		=> 'http://omarg.me',
 		'author'		=> 'Omar G.',
-		'authorsite'	=> 'http://udezain.com.ar/',
+		'authorsite'	=> 'http://omarg.me',
 		'version'		=> '1.0',
-		'compatibility'	=> '16*'
+		'versioncode'	=> 1000,
+		'compatibility'	=> '16*',
+		'guid' 			=> '26965150e8971fde74f06bf1b0495a94',
+		'pl'			=> array(
+			'version'	=> 12,
+			'url'		=> 'http://mods.mybb.com/view/pluginlibrary'
+		)
 	);
 }
 
-//Activate the plugin.
+// _activate
 function ougc_defaultpoststyle_activate()
 {
-	global $db, $lang;
-	isset($lang->ougc_defaultpoststyle) or $lang->load('ougc_defaultpoststyle');
+	global $PL, $lang, $cache;
+	ougc_defaultpoststyle_lang_load();
 	ougc_defaultpoststyle_deactivate();
 
-	$db->insert_query('templates', array(
-		'title'		=>	'ougc_defaultpoststyle_menu',
-		'template'	=>	$db->escape_string('<tr><td class="trow1 smalltext"><a href="{$mybb->settings[\'bburl\']}/usercp.php?action=defaultpoststyle" class="usercp_nav_item usercp_nav_defaultpoststyle" style="background: url(\'images/icons/pencil.gif\') no-repeat left center;">{$lang->ougc_defaultpoststyle_nav}</a></td></tr>'),
-		'sid'		=>	-1,
+	// Add settings group
+	$PL->settings('ougc_defaultpoststyle', $lang->setting_group_ougc_defaultpoststyle, $lang->setting_group_ougc_defaultpoststyle_desc, array(
+		'limit'	=> array(
+		   'title'			=> $lang->setting_ougc_defaultpoststyle_limit,
+		   'description'	=> $lang->setting_ougc_defaultpoststyle_limit_desc,
+		   'optionscode'	=> 'text',
+			'value'			=>	100,
+		),
+		'string'	=> array(
+		   'title'			=> $lang->setting_ougc_defaultpoststyle_string,
+		   'description'	=> $lang->setting_ougc_defaultpoststyle_string_desc,
+		   'optionscode'	=> 'text',
+			'value'			=>	'{MESSAGE}',
+		),
+		'groups'	=> array(
+		   'title'			=> $lang->setting_ougc_defaultpoststyle_groups,
+		   'description'	=> $lang->setting_ougc_defaultpoststyle_groups_desc,
+		   'optionscode'	=> 'text',
+			'value'			=>	'3,4,6',
+		),
+		'forums'	=> array(
+		   'title'			=> $lang->setting_ougc_defaultpoststyle_forums,
+		   'description'	=> $lang->setting_ougc_defaultpoststyle_forums_desc,
+		   'optionscode'	=> 'text',
+			'value'			=>	'',
+		),
+		'newpoints'	=> array(
+		   'title'			=> $lang->setting_ougc_defaultpoststyle_newpoints,
+		   'description'	=> $lang->setting_ougc_defaultpoststyle_newpoints_desc,
+		   'optionscode'	=> 'text',
+			'value'			=>	'',
+		)
 	));
-	$db->insert_query('templates', array(
-		'title'		=>	'ougc_defaultpoststyle',
-		'template'	=>	$db->escape_string('<html>
+
+	// Add template group
+	$PL->templates('ougcdefaultpoststyle', '<lang:setting_group_ougc_defaultpoststyle>', array(
+		''			=> '<html>
 <head>
-<title>{$lang->ougc_defaultpoststyle_nav} | {$mybb->settings[\'bbname\']}</title>
+<title>{$mybb->settings[\'bbname\']} - {$lang->ougc_defaultpoststyle_nav}</title>
 {$headerinclude}
 </head>
 <body>
@@ -113,6 +160,7 @@ function ougc_defaultpoststyle_activate()
 <tr>
 <td class="thead" colspan="2"><strong>{$lang->ougc_defaultpoststyle_nav}</strong></td>
 </tr>
+{$newpoints}
 <tr>
 <td class="trow1" valign="top"><strong>{$lang->ougc_defaultpoststyle_message}</strong>{$smilieinserter}</td>
 <td class="trow1" valign="top"><textarea name="message" id="message" rows="20" cols="70" tabindex="2">{$mybb->input[\'message\']}</textarea>{$codebuttons}</td>
@@ -127,12 +175,9 @@ function ougc_defaultpoststyle_activate()
 </table>
 {$footer}
 </body>
-</html>'),
-		'sid'		=>	-1,
-	));
-	$db->insert_query('templates', array(
-		'title'		=>	'ougc_defaultpoststyle_preview',
-		'template'	=>	$db->escape_string('<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
+</html>',
+		'menu'		=> '<tr><td class="trow1 smalltext"><a href="{$mybb->settings[\'bburl\']}/usercp.php?action=defaultpoststyle" class="usercp_nav_item usercp_nav_defaultpoststyle" style="background: url(\'images/icons/pencil.gif\') no-repeat left center;">{$lang->ougc_defaultpoststyle_nav}</a></td></tr>',
+		'preview'	=> '<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
 <tr>
 <td class="thead"><strong>{$lang->ougc_defaultpoststyle_preview}</strong></td>
 </tr>
@@ -140,240 +185,297 @@ function ougc_defaultpoststyle_activate()
 <td class="trow1" valign="top">{$preview}</td>
 </tr>
 </table>
-<br />'),
-		'sid'		=>	-1,
+<br />',
+		'newpoints'	=> '<tr>
+<td class="tcat" colspan="2"><strong class="smalltext">{$lang->ougc_defaultpoststyle_newpoints}</strong></td>
+</tr>'
 	));
 
-	require_once MYBB_ROOT.'/inc/adminfunctions_templates.php';
-	find_replace_templatesets('usercp_nav_misc', '#'.preg_quote('="usercpmisc_e">').'#', '="usercpmisc_e"><!--OUGC_DPS-->');
+	// Modify templates
+	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
+	find_replace_templatesets('usercp_nav_misc', '#'.preg_quote('="usercpmisc_e">').'#', '="usercpmisc_e"><!--OUGC_DEFAULTPOSTSTYLE-->');
 
-	// Add our settings group.
-	$gid = $db->insert_query('settinggroups', 
-		array(
-			'name'			=> 'ougc_defaultpoststyle',
-			'title'			=> $db->escape_string($lang->ougc_defaultpoststyle_sg),
-			'description'	=> $db->escape_string($lang->ougc_defaultpoststyle_d),
-			'disporder'		=> 99,
-			'isdefault'		=> 'no'
-		)
-	);
-	$gid = intval($gid);
-	$db->insert_query('settings',
-		array(
-			'name'			=>	$db->escape_string('ougc_defaultpoststyle_on'),
-			'title'			=>	$db->escape_string($lang->ougc_defaultpoststyle_on),
-			'description'	=>	$db->escape_string($lang->ougc_defaultpoststyle_on_d),
-			'optionscode'	=>	'onoff',
-			'value'			=>	1,
-			'disporder'		=>	1,
-			'gid'			=>	$gid
-		)
-	);
-	$db->insert_query('settings',
-		array(
-			'name'			=>	$db->escape_string('ougc_defaultpoststyle_groups'),
-			'title'			=>	$db->escape_string($lang->ougc_defaultpoststyle_groups),
-			'description'	=>	$db->escape_string($lang->ougc_defaultpoststyle_groups_d),
-			'optionscode'	=>	'text',
-			'value'			=>	'3,4,5',
-			'disporder'		=>	2,
-			'gid'			=>	$gid
-		)
-	);
-	$db->insert_query('settings',
-		array(
-			'name'			=>	$db->escape_string('ougc_defaultpoststyle_limit'),
-			'title'			=>	$db->escape_string($lang->ougc_defaultpoststyle_limit),
-			'description'	=>	$db->escape_string($lang->ougc_defaultpoststyle_limit_d),
-			'optionscode'	=>	'text',
-			'value'			=>	100,
-			'disporder'		=>	3,
-			'gid'			=>	$gid
-		)
-	);
-	$db->insert_query('settings',
-		array(
-			'name'			=>	$db->escape_string('ougc_defaultpoststyle_update'),
-			'title'			=>	$db->escape_string($lang->ougc_defaultpoststyle_update),
-			'description'	=>	$db->escape_string($lang->ougc_defaultpoststyle_update_d),
-			'optionscode'	=>	'yesno',
-			'value'			=>	1,
-			'disporder'		=>	4,
-			'gid'			=>	$gid
-		)
-	);
-	$db->insert_query('settings',
-		array(
-			'name'			=>	$db->escape_string('ougc_defaultpoststyle_forums'),
-			'title'			=>	$db->escape_string($lang->ougc_defaultpoststyle_forums),
-			'description'	=>	$db->escape_string($lang->ougc_defaultpoststyle_forums_d),
-			'optionscode'	=>	'text',
-			'value'			=>	'',
-			'disporder'		=>	5,
-			'gid'			=>	$gid
-		)
-	);
-	$db->insert_query('settings',
-		array(
-			'name'			=>	$db->escape_string('ougc_defaultpoststyle_private'),
-			'title'			=>	$db->escape_string($lang->ougc_defaultpoststyle_private),
-			'description'	=>	$db->escape_string($lang->ougc_defaultpoststyle_private_d),
-			'optionscode'	=>	'yesno',
-			'value'			=>	'',
-			'disporder'		=>	6,
-			'gid'			=>	$gid
-		)
-	);
-	$db->insert_query('settings',
-		array(
-			'name'			=>	$db->escape_string('ougc_defaultpoststyle_calendar'),
-			'title'			=>	$db->escape_string($lang->ougc_defaultpoststyle_calendar),
-			'description'	=>	$db->escape_string($lang->ougc_defaultpoststyle_calendar_d),
-			'optionscode'	=>	'yesno',
-			'value'			=>	'',
-			'disporder'		=>	7,
-			'gid'			=>	$gid
-		)
-	);
-	$db->insert_query('settings',
-		array(
-			'name'			=>	$db->escape_string('ougc_defaultpoststyle_mydownloads'),
-			'title'			=>	$db->escape_string($lang->ougc_defaultpoststyle_mydownloads),
-			'description'	=>	$db->escape_string($lang->ougc_defaultpoststyle_mydownloads_d),
-			'optionscode'	=>	'yesno',
-			'value'			=>	'',
-			'disporder'		=>	8,
-			'gid'			=>	$gid
-		)
-	);
+	// Insert/update version into cache
+	$plugins = $cache->read('ougc_plugins');
+	if(!$plugins)
+	{
+		$plugins = array();
+	}
+
+	$info = ougc_defaultpoststyle_info();
+
+	if(!isset($plugins['defaultpoststyle']))
+	{
+		$plugins['defaultpoststyle'] = $info['versioncode'];
+	}
+
+	/*~*~* RUN UPDATES START *~*~*/
+
+	/*~*~* RUN UPDATES END *~*~*/
+
+	$plugins['defaultpoststyle'] = $info['versioncode'];
+	$cache->update('ougc_plugins', $plugins);
 }
 
-//Deactivate the plugin.
+// _deactivate
 function ougc_defaultpoststyle_deactivate()
 {
-	global $db;
+	ougc_defaultpoststyle_pl_check();
 
-	$db->delete_query('templates', "title IN('ougc_defaultpoststyle_menu', 'ougc_defaultpoststyle_preview')");
-
-	require_once MYBB_ROOT.'/inc/adminfunctions_templates.php';
-	find_replace_templatesets('usercp_nav_misc', '#'.preg_quote('<!--OUGC_DPS-->').'#', '', 0);
-
-	$gid = $db->fetch_field($db->simple_select('settinggroups', 'gid', 'name="ougc_defaultpoststyle"'), 'gid');
-	if($gid)
-	{
-		$db->delete_query("settings", "gid='{$gid}'");
-		$db->delete_query("settinggroups", "gid='{$gid}'");
-		rebuild_settings();
-	}
+	// Revert template edits
+	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
+	find_replace_templatesets('usercp_nav_misc', '#'.preg_quote('<!--OUGC_DEFAULTPOSTSTYLE-->').'#', '', 0);
 }
 
+// install() routine
 function ougc_defaultpoststyle_install()
 {
 	global $db;
-	ougc_defaultpoststyle_uninstall();
 
-	$db->add_column('users', 'ougc_dps', "varchar(255) NOT NULL DEFAULT ''");
-}
-
-function ougc_defaultpoststyle_uninstall()
-{
-	global $db;
-
-	if($db->field_exists('ougc_dps', 'users'))
+	// Add DB entries
+	if(!$db->field_exists('ougc_defaultpoststyle', 'users'))
 	{
-		$db->drop_column('users', 'ougc_dps');
+		$db->add_column('users', 'ougc_defaultpoststyle', 'varchar(255) NOT NULL DEFAULT \'\'');
 	}
 }
 
+// _is_installed() routine
 function ougc_defaultpoststyle_is_installed()
 {
 	global $db;
 
-	return ($db->field_exists('ougc_dps', 'users'));
+	return $db->field_exists('ougc_defaultpoststyle', 'users');
 }
+
+// _uninstall() routine
+function ougc_defaultpoststyle_uninstall()
+{
+	global $db, $PL, $cache;
+	ougc_defaultpoststyle_pl_check();
+
+	// Drop DB entries
+	if($db->field_exists('ougc_defaultpoststyle', 'users'))
+	{
+		$db->drop_column('users', 'ougc_defaultpoststyle');
+	}
+
+	$PL->settings_delete('ougc_defaultpoststyle');
+	$PL->templates_delete('ougcdefaultpoststyle');
+
+	// Delete version from cache
+	$plugins = (array)$cache->read('ougc_plugins');
+
+	if(isset($plugins['defaultpoststyle']))
+	{
+		unset($plugins['defaultpoststyle']);
+	}
+
+	if(!empty($plugins))
+	{
+		$cache->update('ougc_plugins', $plugins);
+	}
+	else
+	{
+		$PL->cache_delete('ougc_plugins');
+	}
+}
+
+// Loads language strings
+function ougc_defaultpoststyle_lang_load()
+{
+	global $lang;
+
+	isset($lang->setting_group_ougc_defaultpoststyle) or $lang->load('ougc_defaultpoststyle');
+}
+
+// PluginLibrary dependency check & load
+function ougc_defaultpoststyle_pl_check()
+{
+	global $lang;
+	ougc_defaultpoststyle_lang_load();
+	$info = ougc_defaultpoststyle_info();
+
+	if(!file_exists(PLUGINLIBRARY))
+	{
+		flash_message($lang->sprintf($lang->ougc_defaultpoststyle_pl_required, $info['pl']['url'], $info['pl']['version']), 'error');
+		admin_redirect('index.php?module=config-plugins');
+		exit;
+	}
+
+	global $PL;
+
+	$PL or require_once PLUGINLIBRARY;
+
+	if($PL->version < $info['pl']['version'])
+	{
+		flash_message($lang->sprintf($lang->ougc_defaultpoststyle_pl_old, $info['pl']['url'], $info['pl']['version'], $PL->version), 'error');
+		admin_redirect('index.php?module=config-plugins');
+		exit;
+	}
+}
+
+// Language support for settings
+function ougc_defaultpoststyle_settings_change()
+{
+	global $db, $mybb;
+
+	$query = $db->simple_select('settinggroups', 'name', 'gid=\''.(int)$mybb->input['gid'].'\'');
+	$groupname = $db->fetch_field($query, 'name');
+	if($groupname == 'ougc_defaultpoststyle')
+	{
+		global $plugins;
+		ougc_defaultpoststyle_lang_load();
+
+		if($mybb->request_method == 'post')
+		{
+			global $settings;
+
+			$limit = &$mybb->input['upsetting']['ougc_defaultpoststyle_limit'];
+			$limit = ($limit < 1 ? 1 : ($limit > 250 ? 250 : $limit));
+
+			$gids = '';
+			if(isset($mybb->input['ougc_defaultpoststyle_groups']) && is_array($mybb->input['ougc_defaultpoststyle_groups']))
+			{
+				$gids = implode(',', (array)array_filter(array_map('intval', $mybb->input['ougc_defaultpoststyle_groups'])));
+			}
+
+			$mybb->input['upsetting']['ougc_defaultpoststyle_groups'] = $gids;
+
+			$fids = '';
+			if(isset($mybb->input['ougc_defaultpoststyle_forums']) && is_array($mybb->input['ougc_defaultpoststyle_forums']))
+			{
+				$fids = implode(',', (array)array_filter(array_map('intval', $mybb->input['ougc_defaultpoststyle_forums'])));
+			}
+
+			$mybb->input['upsetting']['ougc_defaultpoststyle_forums'] = $fids;
+
+			return;
+		}
+
+		$plugins->add_hook('admin_formcontainer_output_row', 'ougc_defaultpoststyle_formcontainer_output_row');
+	}
+}
+
+// Friendly settings
+function ougc_defaultpoststyle_formcontainer_output_row(&$args)
+{
+	if($args['row_options']['id'] == 'row_setting_ougc_defaultpoststyle_groups')
+	{
+		global $form, $settings;
+
+		$args['content'] = $form->generate_group_select('ougc_defaultpoststyle_groups[]', explode(',', $settings['ougc_defaultpoststyle_groups']), array('multiple' => true, 'size' => 5));
+	}
+	if($args['row_options']['id'] == 'row_setting_ougc_defaultpoststyle_forums')
+	{
+		global $form, $settings;
+
+		$args['content'] = $form->generate_forum_select('ougc_defaultpoststyle_forums[]', explode(',', $settings['ougc_defaultpoststyle_forums']), array('multiple' => true, 'size' => 5));
+	}
+}
+
+// Hijack the UCP menu
 function ougc_defaultpoststyle_menu()
 {
-	global $mybb;
+	global $PL, $mybb;
+	$PL or require_once PLUGINLIBRARY;
 
-	// Disabled
-	if($mybb->settings['ougc_defaultpoststyle_on'] != 1)
+	if($PL->is_member($mybb->settings['ougc_defaultpoststyle_groups']))
 	{
-		return;
-	}
+		global $lang, $templates, $usercpnav;
+		ougc_defaultpoststyle_lang_load();
 
-	if(ougc_check_groups($mybb->settings['ougc_defaultpoststyle_groups']))
-	{
-		global $usercpnav, $lang, $templates;
-		isset($lang->ougc_defaultpoststyle) or $lang->load('ougc_defaultpoststyle');
-
-		eval('$menu = "'.$templates->get('ougc_defaultpoststyle_menu').'";');
-		$usercpnav = str_replace('<!--OUGC_DPS-->', $menu, $usercpnav);
-
-		return $usercpnav;
+		eval('$menu = "'.$templates->get('ougcdefaultpoststyle_menu').'";');
+		$usercpnav = str_replace('<!--OUGC_DEFAULTPOSTSTYLE-->', $menu, $usercpnav);
 	}
 }
 
+// UCP Page
 function ougc_defaultpoststyle_usercp()
 {
-	global $mybb;
+	global $mybb, $plugins;
 
-	// Wrong area
 	if($mybb->input['action'] != 'defaultpoststyle')
 	{
 		return;
 	}
 
-	// Disabled
-	if($mybb->settings['ougc_defaultpoststyle_on'] != 1)
-	{
-		error_no_permission();
-	}
+	global $PL;
+	$PL or require_once PLUGINLIBRARY;
 
-	// Invalid group
-	if(!ougc_check_groups($mybb->settings['ougc_defaultpoststyle_groups']))
+	// Check group permissions
+	if(!$PL->is_member($mybb->settings['ougc_defaultpoststyle_groups']))
 	{
 		error_no_permission();
 	}
 
 	global $templates, $lang, $headerinclude, $header, $footer, $usercpnav, $theme;
-	isset($lang->ougc_defaultpoststyle) or $lang->load('ougc_defaultpoststyle');
+	ougc_defaultpoststyle_lang_load();
 
-	// Our navigations
-	add_breadcrumb($lang->nav_usercp, "{$mybb->settings['bburl']}/usercp.php");
+	// Breadcrumb nav
+	add_breadcrumb($lang->nav_usercp, $mybb->settings['bburl'].'/usercp.php');
 	add_breadcrumb($lang->ougc_defaultpoststyle_nav);
 
-	// Default content for (new users) / (empty content)
-	if($mybb->request_method != 'post' && ($mybb->user['ougc_dps'] || !$mybb->input['message']))
+	$plugins->run_hooks('ougc_defaultpoststyle_usercp_start');
+
+	// Default content for new users / empty content
+	if($mybb->request_method != 'post' && ($mybb->user['ougc_defaultpoststyle'] || !$mybb->input['message']))
 	{
-		$mybb->input['message'] = $mybb->user['ougc_dps'];
+		$mybb->input['message'] = $mybb->user['ougc_defaultpoststyle'];
 		if(!$mybb->input['message'])
 		{
-			$mybb->input['message'] = OUGC_DPS;
+			$mybb->input['message'] = $mybb->settings['ougc_defaultpoststyle_string'];
 		}
 	}
 
-	// Sutmit process
+
+	// START: Newpoints
+	$newpoints = null;
+	if(function_exists('newpoints_addpoints') && $mybb->settings['newpoints_main_enabled'] && $mybb->settings['ougc_defaultpoststyle_newpoints'])
+	{
+		$grouprules = newpoints_getrules('group', $mybb->user['usergroup']);
+		if(!isset($grouprules['rate']))
+		{
+			$grouprules['rate'] = 1;
+		}
+		
+		if(!empty($grouprules['rate']))
+		{
+			$newpoints = (float)round($mybb->settings['ougc_defaultpoststyle_newpoints']*$grouprules['rate'], (int)$mybb->settings['newpoints_main_decimal']);
+		}
+	}
+	// END: Newpoints
+
+	$errors = array();
+
 	if($mybb->request_method == 'post')
 	{
 		// Just verify if this is a valid post input
 		verify_post_check($mybb->input['my_post_key']);
 
-		// Users need to include "OUGC_DPS" into the message
-		$errors = array();
-		if(!my_strpos($mybb->input['message'], OUGC_DPS) && $mybb->input['message'] != '')
+		// Users need to include "ougc_defaultpoststyle_string" value into the message
+		if(!my_strpos($mybb->input['message'], $mybb->settings['ougc_defaultpoststyle_string']) && $mybb->input['message'] != '')
 		{
-			$errors[] = $lang->sprintf($lang->ougc_defaultpoststyle_missingval, OUGC_DPS);
+			$errors[] = $lang->sprintf($lang->ougc_defaultpoststyle_error_missingstring, $mybb->settings['ougc_defaultpoststyle_string']);
 		}
 
-		// We have a 200 characters limit, even if admin setted longer.
-		$limit = intval($mybb->settings['ougc_defaultpoststyle_limit']);
+		// We have a 250 characters limit, even if admin setted longer.
+		$limit = (int)$mybb->settings['ougc_defaultpoststyle_limit'];
 		$limit = ($limit < 1 || $limit > 250 ? 100 : $limit);
+
 		if(my_strlen($mybb->input['message']) > $limit)
 		{
-			$errors[] = $lang->sprintf($lang->ougc_defaultpoststyle_limit, my_number_format($limit));
+			$errors[] = $lang->sprintf($lang->ougc_defaultpoststyle_error_limit, my_number_format($limit));
 		}
 
-		// There are errors..
+		// START: Newpoints
+		if($newpoints !== null && $mybb->user['newpoints'] < $newpoints)
+		{
+			$errors[] = $lang->sprintf($lang->ougc_defaultpoststyle_error_newpoints, newpoints_format_points($newpoints));
+		}
+		// END: Newpoints
+
+		$plugins->run_hooks('ougc_defaultpoststyle_usercp_post', $errors);
+
 		if($errors)
 		{
 			$errors = inline_error($errors);
@@ -381,178 +483,97 @@ function ougc_defaultpoststyle_usercp()
 		elseif($mybb->input['preview'])
 		{
 			global $parser;
-			// Set up the parser options.
-			$parser_options = array(
-				'allow_html' => 0,
-				'allow_mycode' => 1,
-				'allow_smilies' => 1,
-				'allow_imgcode' => 0,
-				'allow_videocode' => 0,
-				'filter_badwords' => 1
-			);
 
-			$preview = $parser->parse_message($mybb->input['message'], $parser_options);
-			eval('$preview = "'.$templates->get('ougc_defaultpoststyle_preview').'";');
+			$preview = $parser->parse_message($mybb->input['message'], array(
+				'allow_html'		=> 0,
+				'allow_mycode'		=> 1,
+				'allow_smilies'		=> 1,
+				'allow_imgcode'		=> 1,
+				'allow_videocode'	=> 1,
+				'filter_badwords'	=> 1
+			));
+
+			eval('$preview = "'.$templates->get('ougcdefaultpoststyle_preview').'";');
 		}
-		// Everything is alright, save it
 		else
 		{
 			global $db;
-			if($mybb->input['message'] == OUGC_DPS)
+
+			if($mybb->input['message'] == $mybb->settings['ougc_defaultpoststyle_string'])
 			{
 				$mybb->input['message'] = '';
 			}
 
-			$db->update_query('users', array('ougc_dps' => $db->escape_string($mybb->input['message'])), "uid='{$mybb->user['uid']}'");
-			redirect("{$mybb->settings['bburl']}/usercp.php", $lang->ougc_defaultpoststyle_redirect);
+			// START: Newpoints
+			if($newpoints !== null)
+			{
+				newpoints_addpoints($mybb->user['uid'], -$newpoints);
+			}
+			// END: Newpoints
+
+			$db->update_query('users', array(
+				'ougc_defaultpoststyle'	=> $db->escape_string($mybb->input['message'])
+			), 'uid=\''.$mybb->user['uid'].'\'');
+			redirect($mybb->settings['bburl'].'/usercp.php', $lang->ougc_defaultpoststyle_redirect);
 		}
 	}
-	if(is_array($errors))
-	{
-		$errors = '';
-	}
-	if(!$preview)
-	{
-		$preview = '';
-	}
 
-	// Fancy stuff
-	$smilieinserter = $codebuttons = '';
-	if($mybb->settings['smilieinserter'] == 1)
+	// START: Newpoints
+	if($newpoints === null)
 	{
-		$smilieinserter = build_clickable_smilies();
+		$newpoints = '';
 	}
-	if($mybb->settings['bbcodeinserter'] == 1)
+	else
 	{
-		$codebuttons = build_mycode_inserter();
+		$lang->ougc_defaultpoststyle_newpoints = $lang->sprintf($lang->ougc_defaultpoststyle_newpoints, newpoints_format_points($newpoints));
+		eval('$newpoints = "'.$templates->get('ougcdefaultpoststyle_newpoints').'";');
 	}
+	// END: Newpoints
 
-	eval('$page = "'.$templates->get('ougc_defaultpoststyle').'";');
+	$errors = is_array($errors) ? '' : $errors;
+	$preview = !$preview ? '' : $preview;
+
+	$smilieinserter = $mybb->settings['smilieinserter'] ? build_clickable_smilies() : '';
+	$codebuttons = $mybb->settings['bbcodeinserter'] ? build_mycode_inserter() : '';
+
+	$plugins->run_hooks('ougc_defaultpoststyle_usercp_end');
+
+	eval('$page = "'.$templates->get('ougcdefaultpoststyle').'";');
 	output_page($page);
 	exit;
 }
 
-function ougc_defaultpoststyle_default()
+// Do the replacements
+function ougc_defaultpoststyle_run()
 {
-	global $mybb, $settings;
+	global $PL, $mybb;
+	$PL or require_once PLUGINLIBRARY;
 
-	// Private Messages
-	if(THIS_SCRIPT == 'private.php')
+	// Check group permissions
+	if(!$PL->is_member($mybb->settings['ougc_defaultpoststyle_groups']))
 	{
-		if($settings['ougc_defaultpoststyle_private'] == 1)
-		{
-			$mybb->input['message'] = ougc_defaultpoststyle_split($mybb->input['message']);
-		}
-		return $mybb;
+		return;
 	}
 
-	// Calendar
-	if(THIS_SCRIPT == 'calendar.php')
+	global $fid;
+
+	// Check forum permissions
+	if($PL->is_member($mybb->settings['ougc_defaultpoststyle_forums'], array('usergroup' => (int)$fid)))
 	{
-		if($settings['ougc_defaultpoststyle_calendar'] == 1)
-		{
-			$mybb->input['description'] = ougc_defaultpoststyle_split($mybb->input['description']);
-		}
-		return $mybb;
+		return;
 	}
 
-	// Calendar
-	if(THIS_SCRIPT == 'mydownloads/comment_download.php')
+	$key = 'message';
+	if(!empty($mybb->input['description']))
 	{
-		if($settings['ougc_defaultpoststyle_mydownloads'] == 1)
-		{
-			$mybb->input['message'] = ougc_defaultpoststyle_split($mybb->input['message']);
-		}
-		return $mybb;
+		$key = 'description';
 	}
 
-	$mybb->input['message'] = ougc_defaultpoststyle_split($mybb->input['message'], $GLOBALS['fid']);
-	return $mybb;
-}
-
-// Sooo, save us time god of light!!
-function ougc_defaultpoststyle_split($message, $fid=0)
-{
-	global $mybb;
-
-	// Disabled
-	if($mybb->settings['ougc_defaultpoststyle_on'] != 1)
+	if(empty($mybb->input[$key]))
 	{
-		return $message;
+		return;
 	}
 
-	// Invalid group
-	if(!ougc_check_groups($mybb->settings['ougc_defaultpoststyle_groups']))
-	{
-		$update = true;
-	}
-
-	// For some reason this user's DPS seems to be invalid...
-	if(!my_strpos($mybb->user['ougc_dps'], OUGC_DPS))
-	{
-		$update = true;
-	}
-
-	// Invalid for some reason
-	if($update)
-	{
-		// Should we remove/update it?
-		if($mybb->settings['ougc_defaultpoststyle_update'] == 1)
-		{
-			global $db;
-
-			$db->update_query('users', array('ougc_dps' => ''), "uid='{$mybb->user['uid']}'");
-		}
-		return $message;
-	}
-
-	// Invalid forum.
-	if($fid && !empty($mybb->settings['ougc_defaultpoststyle_forums']))
-	{
-		$forums = explode(',', $mybb->settings['ougc_defaultpoststyle_forums']);
-		$forums = array_map('intval', $forums);
-		if(in_array($fid, $forums))
-		{
-			return $message;
-		}
-	}
-
-	// Split the thing
-	$dps = preg_split("#".OUGC_DPS."#", $mybb->user['ougc_dps']);
-	if($dps[0] && $dps[1])
-	{
-		return $dps[0].$message.$dps[1];
-	}
-	return $message;
-}
-
-// This will check current user's groups.
-if(!function_exists('ougc_check_groups'))
-{
-	function ougc_check_groups($groups, $empty=true)
-	{
-		global $mybb;
-		if(empty($groups) && $empty == true)
-		{
-			return true;
-		}
-		if(!empty($mybb->user['additionalgroups']))
-		{
-			$usergroups = explode(',', $mybb->user['additionalgroups']);
-		}
-		if(!is_array($usergroups))
-		{
-			$usergroups = array();
-		}
-		$usergroups[] = $mybb->user['usergroup'];
-		$groups = explode(',', $groups);
-		foreach($usergroups as $gid)
-		{
-			if(in_array($gid, $groups))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+	$dps = preg_split('#'.$mybb->settings['ougc_defaultpoststyle_string'].'#', $mybb->user['ougc_defaultpoststyle']);
+	$mybb->input[$key] = $dps[0].$mybb->input[$key].$dps[1];
 }

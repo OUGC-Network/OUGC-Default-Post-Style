@@ -2,9 +2,9 @@
 
 /***************************************************************************
  *
- *   OUGC Default Post Style plugin
+ *   OUGC Default Post Style plugin (/inc/languages/english/admin/ougc_defaultpoststyle.php)
  *	 Author: Omar Gonzalez
- *   Copyright: © 2012 Omar Gonzalez
+ *   Copyright: Â© 2012-2014 Omar Gonzalez
  *   
  *   Website: http://omarg.me
  *
@@ -27,22 +27,22 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 
-$l['ougc_defaultpoststyle'] = 'OUGC Default Post Style';
-$l['ougc_defaultpoststyle_d'] = 'Give your users the option to set a default style for their posts.';
-$l['ougc_defaultpoststyle_sg'] = 'OUGC Default Post Style Settings';
-$l['ougc_defaultpoststyle_on'] = 'Activate Feature';
-$l['ougc_defaultpoststyle_on_d'] = 'Turn this On/Off without losing any data.';
-$l['ougc_defaultpoststyle_groups'] = 'Allowed Groups';
-$l['ougc_defaultpoststyle_groups_d'] = 'Comma separated list of groups that can use this feature.';
-$l['ougc_defaultpoststyle_limit'] = 'Character Limit';
-$l['ougc_defaultpoststyle_limit_d'] = 'The maximum number of characters users can user for their DPS.';
-$l['ougc_defaultpoststyle_update'] = 'Update Users';
-$l['ougc_defaultpoststyle_update_d'] = 'Update users DPS if they are not allowed to use it, or if, somehow, it is invalid.';
-$l['ougc_defaultpoststyle_forums'] = 'Forums To Ignore';
-$l['ougc_defaultpoststyle_forums_d'] = 'Forum to from this feature';
-$l['ougc_defaultpoststyle_private'] = 'Private Messages';
-$l['ougc_defaultpoststyle_private_d'] = 'Use this for private messages?';
-$l['ougc_defaultpoststyle_calendar'] = 'Calendar Events';
-$l['ougc_defaultpoststyle_calendar_d'] = 'Use this for calendar events?';
-$l['ougc_defaultpoststyle_mydownloads'] = 'MyDownloads Comments';
-$l['ougc_defaultpoststyle_mydownloads_d'] = 'Use this for MyDownloads Comments?';
+// Plugin API
+$l['setting_group_ougc_defaultpoststyle'] = 'OUGC Default Post Style';
+$l['setting_group_ougc_defaultpoststyle_desc'] = 'Allow users to set a default style for their posts/messages.';
+
+// Settings
+$l['setting_ougc_defaultpoststyle_limit'] = 'Character Limit';
+$l['setting_ougc_defaultpoststyle_limit_desc'] = 'Maximum number of characters users may use for their default post style.';
+$l['setting_ougc_defaultpoststyle_string'] = 'Replacement String';
+$l['setting_ougc_defaultpoststyle_string_desc'] = 'String to be replaced within the post style to define the post\'s content.';
+$l['setting_ougc_defaultpoststyle_groups'] = 'Allowed Groups';
+$l['setting_ougc_defaultpoststyle_groups_desc'] = 'Allowed groups to use this feature.';
+$l['setting_ougc_defaultpoststyle_forums'] = 'Ignored Forums';
+$l['setting_ougc_defaultpoststyle_forums_desc'] = 'Forums to exclude from this feature.';
+$l['setting_ougc_defaultpoststyle_newpoints'] = 'Require Newpoints Payment';
+$l['setting_ougc_defaultpoststyle_newpoints_desc'] = 'Insert the amount of points users need to pay each time they update their default post style.';
+
+// PluginLibrary
+$l['ougc_defaultpoststyle_pl_required'] = 'This plugin requires <a href="{1}">PluginLibrary</a> version {2} or later to be uploaded to your forum.';
+$l['ougc_defaultpoststyle_pl_old'] = 'This plugin requires <a href="{1}">PluginLibrary</a> version {2} or later, whereas your current version is {3}.';

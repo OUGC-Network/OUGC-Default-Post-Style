@@ -2,9 +2,9 @@
 
 /***************************************************************************
  *
- *   OUGC Default Post Style plugin
+ *   OUGC Default Post Style plugin (/inc/languages/english/ougc_defaultpoststyle.php)
  *	 Author: Omar Gonzalez
- *   Copyright: © 2012 Omar Gonzalez
+ *   Copyright: Â© 2012-2014 Omar Gonzalez
  *   
  *   Website: http://omarg.me
  *
@@ -27,11 +27,16 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
 
-$l['ougc_defaultpoststyle'] = 'OUGC Default Post Style';
+// Plugin API
+$l['setting_group_ougc_defaultpoststyle'] = 'OUGC Default Post Style';
+
+// UCP Page
 $l['ougc_defaultpoststyle_nav'] = 'Default Post Style';
 $l['ougc_defaultpoststyle_message'] = 'Your Message:';
 $l['ougc_defaultpoststyle_save'] = 'Save';
 $l['ougc_defaultpoststyle_preview'] = 'Preview';
-$l['ougc_defaultpoststyle_missingval'] = 'You need to include "{1}" into your message.';
-$l['ougc_defaultpoststyle_limit'] = 'Your DPS cannot be longer that {1} characters.';
+$l['ougc_defaultpoststyle_error_missingstring'] = 'You need to include "{1}" in your message.';
+$l['ougc_defaultpoststyle_error_limit'] = 'Your default post style can\'t be longer that {1} characters.';
+$l['ougc_defaultpoststyle_error_newpoints'] = 'You don\'t have enought points to update your default post style.';
 $l['ougc_defaultpoststyle_redirect'] = 'Your default post style has been updated.<br /><br />You will now be redirected.';
+$l['ougc_defaultpoststyle_newpoints'] = 'The payment to update your default post style is {1}.';
