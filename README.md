@@ -3,22 +3,22 @@
 ## OUGC Default Post Style
 Allow users to set a default style for their posts/messages.
 
-### PluginLibrary
-This plugin requires the [PluginLibrary](http://mods.mybb.com/view/pluginlibrary "Download PluginLibrary") plugin for MyBB to work.
+***
 
-### Licence
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+### Requirements
+- [MyBB](http://www.mybb.com/downloads "Download MyBB") version 1.6.5+
+- [PluginLibrary](http://mods.mybb.com/view/pluginlibrary "Download PluginLibrary") library for MyBB to work.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+### Installation
+1. Upload the content of the "upload" folder to your MyBB root folder.
+2. Go to ACP -> Configuration -> Plugins and activate the plugin.
+3. Edit general settings from "OUGC Default Post Style".
+4. __Enjoy!__
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+### Update
+#### 1.0 to 1.1
+1. Deactivate/Uninstall old plugin (plugin data will get lost).
+2. Follow "Installation" instructions.
 
 ### Support
 Please visit [MyBB Plugins](http://forums.mybb-plugins.com/Forum-Free-Plugins--29 "Visit MyBB Plugins") for premium support. Free support may be received in the [MyBB Community](http://community.mybb.com "Visit MyBB Community")
