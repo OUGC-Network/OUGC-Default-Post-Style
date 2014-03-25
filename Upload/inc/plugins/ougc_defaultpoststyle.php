@@ -90,7 +90,7 @@ function ougc_defaultpoststyle_info()
 		'version'		=> '1.1',
 		'versioncode'	=> 1100,
 		'compatibility'	=> '16*',
-		'guid' 			=> '72427c060cddfaa5c6e45f55bcbadc37',
+		'guid' 			=> '59241ab4cbb502a720aa7a995545eb51',
 		'pl'			=> array(
 			'version'	=> 12,
 			'url'		=> 'http://mods.mybb.com/view/pluginlibrary'
