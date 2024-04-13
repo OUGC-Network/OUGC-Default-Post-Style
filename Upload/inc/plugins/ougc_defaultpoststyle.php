@@ -30,6 +30,8 @@
 // Die if IN_MYBB is not defined, for security reasons.
 defined('IN_MYBB') or die('This file cannot be accessed directly.');
 
+global $plugins, $mybb;
+
 // Run/Add Hooks
 if(defined('IN_ADMINCP'))
 {
@@ -39,8 +41,6 @@ if(defined('IN_ADMINCP'))
 }
 else
 {
-	global $plugins, $mybb;
-
 	$plugins->add_hook('usercp_menu_built', 'ougc_defaultpoststyle_menu');
 	$plugins->add_hook('usercp_start', 'ougc_defaultpoststyle_usercp');
 
@@ -50,7 +50,7 @@ else
 	$plugins->add_hook('calendar_do_addevent_start', 'ougc_defaultpoststyle_run');
 	$plugins->add_hook('comment_download_start', 'ougc_defaultpoststyle_run');
 
-	if(in_array(THIS_SCRIPT, array('usercp.php', 'usercp2.php', 'private.php')))
+	if(in_array(constant('THIS_SCRIPT'), array('usercp.php', 'usercp2.php', 'private.php')))
 	{
 		global $templatelist;
 
@@ -73,7 +73,7 @@ else
 }
 
 // PLUGINLIBRARY
-defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', MYBB_ROOT.'inc/plugins/pluginlibrary.php');
+defined('PLUGINLIBRARY') or define('PLUGINLIBRARY', constant('MYBB_ROOT').'inc/plugins/pluginlibrary.php');
 
 // Plugin API
 function ougc_defaultpoststyle_info()
@@ -89,7 +89,7 @@ function ougc_defaultpoststyle_info()
 		'authorsite'	=> 'http://omarg.me',
 		'version'		=> '1.1',
 		'versioncode'	=> 1100,
-		'compatibility'	=> '16*',
+		'compatibility'	=> '18*',
 		'guid' 			=> '59241ab4cbb502a720aa7a995545eb51',
 		'pl'			=> array(
 			'version'	=> 12,
@@ -192,7 +192,7 @@ function ougc_defaultpoststyle_activate()
 	));
 
 	// Modify templates
-	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
+	require_once constant('MYBB_ROOT').'inc/adminfunctions_templates.php';
 	find_replace_templatesets('usercp_nav_misc', '#'.preg_quote('="usercpmisc_e">').'#', '="usercpmisc_e"><!--OUGC_DEFAULTPOSTSTYLE-->');
 
 	// Insert/update version into cache
@@ -223,7 +223,7 @@ function ougc_defaultpoststyle_deactivate()
 	ougc_defaultpoststyle_pl_check();
 
 	// Revert template edits
-	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
+	require_once constant('MYBB_ROOT').'inc/adminfunctions_templates.php';
 	find_replace_templatesets('usercp_nav_misc', '#'.preg_quote('<!--OUGC_DEFAULTPOSTSTYLE-->').'#', '', 0);
 }
 
@@ -384,7 +384,7 @@ function ougc_defaultpoststyle_menu()
 		global $lang, $templates, $usercpnav;
 		ougc_defaultpoststyle_lang_load();
 
-		eval('$menu = "'.$templates->get('ougcdefaultpoststyle_menu').'";');
+        $menu = eval($templates->render('ougcdefaultpoststyle_menu'));
 		$usercpnav = str_replace('<!--OUGC_DEFAULTPOSTSTYLE-->', $menu, $usercpnav);
 	}
 }
@@ -538,7 +538,8 @@ function ougc_defaultpoststyle_usercp()
 
 	$plugins->run_hooks('ougc_defaultpoststyle_usercp_end');
 
-	eval('$page = "'.$templates->get('ougcdefaultpoststyle').'";');
+    $page = eval($templates->render('ougcdefaultpoststyle'));
+
 	output_page($page);
 	exit;
 }
