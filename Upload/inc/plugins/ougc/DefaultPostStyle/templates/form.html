@@ -1,0 +1,75 @@
+<html>
+<head>
+    <title>{$mybb->settings['bbname']} - {$lang->ougcDefaultPostStyleUserControlTitle}</title>
+    {$headerinclude}
+</head>
+<body>
+{$header}
+<table width="100%" border="0" align="center">
+    <tr>
+        {$usercpnav}
+        <td valign="top">
+            {$errorMessages}
+            {$previewTemplate}
+            <form action="{$mybb->settings['bburl']}/{$pageUrl}" method="post">
+                <input type="hidden" name="my_post_key" value="{$mybb->post_code}"/>
+                <input type="hidden" name="action" value="{$pageAction}"/>
+                <input type="hidden" name="createTemplate" value="{$mybb->input['createTemplate']}"/>
+                <input type="hidden" name="editTemplate" value="{$templateID}"/>
+                <input type="hidden" name="userID" value="{$userID}"/>
+                <table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}"
+                       class="tborder">
+                    <tr>
+                        <td class="thead" colspan="2">
+                            <strong>{$formTitle}</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="tcat" colspan="2"><strong>{$formDescription}</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="trow1">
+                            <strong>{$lang->ougcDefaultPostStyleUserControlPanelFormTemplateName}:</strong>
+                        </td>
+                        <td class="trow1"><input type="text" class="textbox" name="templateName" size="40"
+                                                 maxlength="200"
+                                                 value="{$templateName}" tabindex="1"/></td>
+                    </tr>
+                    {$templateStyleRow}
+                    <tr>
+                        <td class="trow2" valign="top">
+                            <strong>{$lang->ougcDefaultPostStyleUserControlPanelFormTemplateContents}:</strong>{$smilieInserter}
+                        </td>
+                        <td class="trow2"><textarea name="templateContents" id="templateContents" rows="20" cols="70"
+                                                    tabindex="5">{$templateContents}</textarea>
+                            {$codeButtons}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="trow2" valign="top">
+                            <strong>{$lang->ougcDefaultPostStyleUserControlPanelFormTemplateOptions}:</strong>
+                        </td>
+                        <td class="trow2 smalltext">
+                            <label><input type="checkbox" class="checkbox" name="isEnabled" value="1"
+                                          {$checkElementIsEnabled} tabindex="6"/> <strong>{$lang->ougcDefaultPostStyleUserControlPanelFormIsEnabled}:</strong>
+                                {$lang->ougcDefaultPostStyleUserControlPanelFormIsEnabledDescription}</label><br/>
+                            <label><input type="checkbox" class="checkbox" name="isDefault" value="1"
+                                          {$checkElementIsDefault} tabindex="6"/> <strong>{$lang->ougcDefaultPostStyleUserControlPanelFormIsDefault}:</strong>
+                                {$lang->ougcDefaultPostStyleUserControlPanelFormIsDefaultDescription}</label>
+                        </td>
+                    </tr>
+                    {$newpointsRow}
+                </table>
+                <br class="clear"/>
+                <div align="center">
+                    <input type="submit" class="button" name="submit"
+                           value="{$lang->ougcDefaultPostStyleUserControlPanelFormButtonSave}" tabindex="6"
+                           accesskey="s"/>
+                    <input type="submit" class="button" name="preview"
+                           value="{$lang->ougcDefaultPostStyleUserControlPanelFormButtonPreview}" tabindex="7"/>
+                </div>
+            </form>
+    </tr>
+</table>
+{$footer}
+</body>
+</html>

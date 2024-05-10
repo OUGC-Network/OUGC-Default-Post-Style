@@ -1,0 +1,51 @@
+{
+  "forums": {
+    "optionscode": "forumselect",
+    "value": ""
+  },
+  "groups": {
+    "optionscode": "groupselect",
+    "value": -1
+  },
+  "moderatorGroups": {
+    "optionscode": "groupselect",
+    "value": 4
+  },
+  "parserOptions": {
+    "optionscode": "checkbox",
+    "options": [
+      "allowHTML",
+      "allowMyCode",
+      "allowSmilies",
+      "allowImageCode",
+      "allowVideoCode",
+      "allowMeCode",
+      "filterBadWords"
+    ],
+    "value": "allowMyCode,allowSmilies,filterBadWords"
+  },
+  "limit": {
+    "optionscode": "numeric",
+    "value": 30000
+  },
+  "string": {
+    "optionscode": "text",
+    "value": "{MESSAGE}"
+  },
+  "newpoints": {
+    "optionscode": "text",
+    "value": 0
+  },
+  "fallbackToDefault": {
+    "optionscode": "yesno",
+    "value": 0
+  },
+  "enableInsertButton": {
+    "optionscode": "yesno",
+    "value": 0
+  },
+  "pageAction": {
+    "optionscode": "text",
+    "value": "defaultpoststyle"
+  }
+}

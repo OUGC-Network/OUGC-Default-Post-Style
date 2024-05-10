@@ -1,0 +1,35 @@
+<input type="submit" class="button" value="{$lang->ougcDefaultPostStyleNewReplyRowButton}"
+       id="ougcDefaultPostStyleTemplateSelectButton" title="{$lang->ougcDefaultPostStyleNewReplyRowButtonTitle}">
+<script type="text/javascript">
+    $(window).on("load", function(){
+        $('#ougcDefaultPostStyleTemplateSelectButton').click(function(event){
+            event.preventDefault();
+
+            var templateID = $('#ougcDefaultPostStyleTemplateSelect').val();
+
+            $.ajax({
+                url: '{$mybb->settings['bburl']}/xmlhttp.php?action=ougcDefaultPostStyle&templateID=' + templateID,
+                type: 'post',
+                dataType: 'html',
+                success: function (result) {
+                    const resultObjects = $.parseJSON(result);
+
+                    if (typeof resultObjects.success !== 'undefined') {
+                        $('#message').val(
+                            $('#message').val() + resultObjects.templateContents
+                        );
+
+                        $('#message').sceditor('instance').insert( resultObjects.templateContents );
+
+                        $('#ougcDefaultPostStyleTemplateSelect').val(0);
+                    } else {
+                        $.jGrowl(lang.unknown_error, {theme: 'jgrowl_error'});
+                    }
+                },
+                error: function () {
+                    $.jGrowl(lang.unknown_error, {theme: 'jgrowl_error'});
+                }
+            });
+        });
+    });
+</script>
