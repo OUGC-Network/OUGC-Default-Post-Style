@@ -46,7 +46,7 @@ define('ougc\DefaultPostStyle\Core\SETTINGS', [
     'allowedGroupsStyleCode' => '', // disabled because this does nothing at the moment
 ]);
 
-define('ougc\DefaultPostStyle\Core\DEBUG', true);
+define('ougc\DefaultPostStyle\Core\DEBUG', false);
 
 define('ougc\DefaultPostStyle\ROOT', constant('MYBB_ROOT') . 'inc/plugins/ougc/DefaultPostStyle');
 
