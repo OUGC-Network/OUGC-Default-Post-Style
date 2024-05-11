@@ -1,0 +1,16 @@
+<tr>
+    <td class="{$alternativeBackground}">{$templateName}</td>
+    <td class="{$alternativeBackground}" align="center">{$templateIsEnabled}</td>
+    <td class="{$alternativeBackground}" align="center">{$templateIsDefault}</td>
+    <td class="{$alternativeBackground}" align="center">{$templateUpdateDate}</td>
+    <td class="{$alternativeBackground}" align="center"
+        class="postbit_buttons post_management_buttons float_right post_controls">
+        <a href="{$mybb->settings['bburl']}/{$editLink}"
+           title="{$lang->ougcDefaultPostStyleUserControlPanelRowsTemplateOptionsEdit}"
+           class="postbit_edit postbit_mirage"><span>{$lang->ougcDefaultPostStyleUserControlPanelRowsTemplateOptionsEdit}</span></a>
+        <a href="{$mybb->settings['bburl']}/{$deleteLink}"
+           title="{$lang->ougcDefaultPostStyleUserControlPanelRowsTemplateOptionsDelete}"
+           class="postbit_edit postbit_mirage"
+           onclick="javascript: return confirm('{$lang->ougcDefaultPostStyleUserControlPanelConfirmDelete}');"><span>{$lang->ougcDefaultPostStyleUserControlPanelRowsTemplateOptionsDelete}</span></a>
+    </td>
+</tr>
