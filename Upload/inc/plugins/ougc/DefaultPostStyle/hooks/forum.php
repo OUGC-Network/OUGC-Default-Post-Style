@@ -32,6 +32,7 @@ namespace ougc\DefaultPostStyle\Hooks\Forum;
 
 use MyBB;
 
+use PostDataHandler;
 use UserDataHandler;
 
 use function ougc\DefaultPostStyle\Core\deleteUserTemplate;
@@ -39,6 +40,7 @@ use function ougc\DefaultPostStyle\Core\getSetting;
 use function ougc\DefaultPostStyle\Core\getUserTemplate;
 use function ougc\DefaultPostStyle\Core\getUserTemplates;
 use function ougc\DefaultPostStyle\Core\insertUserTemplate;
+use function ougc\DefaultPostStyle\Core\isIgnoredForum;
 use function ougc\DefaultPostStyle\Core\loadLanguage;
 use function ougc\DefaultPostStyle\Core\getTemplate;
 use function ougc\DefaultPostStyle\Core\addPoints;
@@ -156,7 +158,7 @@ function usercp_start(bool $isModeratorPanel = false)
 
         add_breadcrumb($lang->ougcDefaultPostStyleModeratorControlTitle);
 
-        $userID = $mybb->get_input('userID', \MyBB::INPUT_INT);
+        $userID = $mybb->get_input('userID', MyBB::INPUT_INT);
 
         if (isset($mybb->input['userName'])) {
             $userData = get_user_by_username($mybb->get_input('userName'));
@@ -466,19 +468,19 @@ function modcp_start()
     usercp_start(true);
 }
 
-function datahandler_post_validate_thread(\PostDataHandler $postDataHandler): \PostDataHandler
+function datahandler_post_validate_thread(PostDataHandler $postDataHandler): PostDataHandler
 {
     return datahandler_post_validate_post($postDataHandler);
 }
 
-function datahandler_post_validate_post(\PostDataHandler $postDataHandler): \PostDataHandler
+function datahandler_post_validate_post(PostDataHandler $postDataHandler): PostDataHandler
 {
     global $mybb;
     global $ougcDefaultPostStyleSelectedTemplateID;
 
     $forumID = (int)$postDataHandler->data['fid'];
 
-    if (\ougc\DefaultPostStyle\Core\isIgnoredForum($forumID) || !is_member(
+    if (isIgnoredForum($forumID) || !is_member(
             getSetting('groups'),
             get_user($postDataHandler->data['uid'])
         )) {
@@ -491,7 +493,7 @@ function datahandler_post_validate_post(\PostDataHandler $postDataHandler): \Pos
 
     $selectedTemplateID = $ougcDefaultPostStyleSelectedTemplateID = $mybb->get_input(
         'ougcDefaultPostStyleTemplateID',
-        \MyBB::INPUT_INT
+        MyBB::INPUT_INT
     );
 
     $userID = (int)$postDataHandler->data['uid'];
@@ -507,12 +509,12 @@ function datahandler_post_validate_post(\PostDataHandler $postDataHandler): \Pos
     return $postDataHandler;
 }
 
-function datahandler_post_insert_thread_post(\PostDataHandler $postDataHandler): \PostDataHandler
+function datahandler_post_insert_thread_post(PostDataHandler $postDataHandler): PostDataHandler
 {
     return datahandler_post_insert_post($postDataHandler);
 }
 
-function datahandler_post_insert_post(\PostDataHandler $postDataHandler): \PostDataHandler
+function datahandler_post_insert_post(PostDataHandler $postDataHandler): PostDataHandler
 {
     global $ougcDefaultPostStyleSelectedTemplateID;
 
@@ -529,7 +531,7 @@ function datahandler_post_insert_post(\PostDataHandler $postDataHandler): \PostD
     return $postDataHandler;
 }
 
-function datahandler_post_update(\PostDataHandler $postDataHandler): \PostDataHandler
+function datahandler_post_update(PostDataHandler $postDataHandler): PostDataHandler
 {
     return datahandler_post_insert_post($postDataHandler);
 }
@@ -541,7 +543,7 @@ function postbit_prev(array $postData): array
     if (isset($mybb->input['ougcDefaultPostStyleTemplateID'])) {
         $postData['ougcDefaultPostStyleTemplateID'] = $mybb->get_input(
             'ougcDefaultPostStyleTemplateID',
-            \MyBB::INPUT_INT
+            MyBB::INPUT_INT
         );
     }
 
@@ -562,15 +564,11 @@ function postbit(array $postData): array
 {
     $forumID = (int)$postData['fid'];
 
-    if (\ougc\DefaultPostStyle\Core\isIgnoredForum($forumID) || !is_member(
+    if (isIgnoredForum($forumID) || !is_member(
             getSetting('groups'),
             get_user($postData['uid'])
         )) {
         return $postData;
-    }
-
-    if ($postData['pid'] == 304) {
-        _dump($postData);
     }
 
     if (empty($postData['ougcDefaultPostStyleTemplateID']) && getSetting('fallbackToDefault')) {
@@ -606,7 +604,7 @@ function newreply_end(bool $editPost = false)
 
     $forumID = (int)$fid;
 
-    if (\ougc\DefaultPostStyle\Core\isIgnoredForum($forumID) || !is_member(getSetting('groups'))) {
+    if (isIgnoredForum($forumID) || !is_member(getSetting('groups'))) {
         return false;
     }
 
@@ -616,8 +614,8 @@ function newreply_end(bool $editPost = false)
 
     $defaultTemplateID = (int)$mybb->user['ougcDefaultPostStyleDefaultTemplateID'];
 
-    if ($mybb->get_input('ougcDefaultPostStyleTemplateID', \MyBB::INPUT_INT)) {
-        $defaultTemplateID = $mybb->get_input('ougcDefaultPostStyleTemplateID', \MyBB::INPUT_INT);
+    if ($mybb->get_input('ougcDefaultPostStyleTemplateID', MyBB::INPUT_INT)) {
+        $defaultTemplateID = $mybb->get_input('ougcDefaultPostStyleTemplateID', MyBB::INPUT_INT);
     } elseif ($editPost) {
         global $post;
 
