@@ -99,13 +99,13 @@ function _info(): array
     loadLanguage();
 
     return [
-        'name' => 'OUGC Default Post Style',
+        'name' => 'OUGC Default Post Style (Templates)',
         'description' => $lang->ougcDefaultPostStyleDescription,
         'website' => 'https://ougc.network',
         'author' => 'Omar G.',
         'authorsite' => 'https://ougc.network',
-        'version' => '1.8.0',
-        'versioncode' => 1800,
+        'version' => '1.8.1',
+        'versioncode' => 1801,
         'compatibility' => '18*',
         'codename' => 'ougcDefaultPostStyle',
         'pl' => [
