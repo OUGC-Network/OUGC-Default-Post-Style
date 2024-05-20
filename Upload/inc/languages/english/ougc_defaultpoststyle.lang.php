@@ -27,7 +27,7 @@
  ****************************************************************************/
 
 $l = [
-    'ougcDefaultPostStyle' => 'OUGC Default Post Style',
+    'ougcDefaultPostStyle' => 'OUGC Default Post Style (Templates)',
 
     'ougcDefaultPostStyleUserControlTitle' => 'Default Post Style',
     'ougcDefaultPostStyleUserControlPanelNav' => 'Post Style (Templates)',

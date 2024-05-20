@@ -103,7 +103,7 @@ A setup that meets the following requirements is necessary to use this plugin.
 
 Follow the next steps in order to install a copy of this plugin on your forum.
 
-1. Download the latest package from the [MyBB Extend](https://community.mybb.com/mods.php?action=view&pid=399) site or
+1. Download the latest package from the [MyBB Extend](https://community.mybb.com/mods.php?action=view&pid=1601) site or
    from
    the [repository releases](https://github.com/OUGC-Network/OUGC-Default-Post-Style/releases/latest).
 2. Upload the contents of the _Upload_ folder to your MyBB root directory.

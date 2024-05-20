@@ -32,6 +32,8 @@ namespace ougc\DefaultPostStyle\Core;
 
 use PostDataHandler;
 
+use postParser;
+
 use function ougc\DefaultPostStyle\Admin\_info;
 
 use const ougc\DefaultPostStyle\Core\SETTINGS;
@@ -295,10 +297,10 @@ function parseTemplate(string $templateContents, string $messageContent = ''): s
 {
     global $parser;
 
-    if (!($parser instanceof \postParser)) {
+    if (!($parser instanceof postParser)) {
         require_once MYBB_ROOT . '/inc/class_parser.php';
 
-        $parser = new \postParser();
+        $parser = new postParser();
     }
 
     global $mybb;

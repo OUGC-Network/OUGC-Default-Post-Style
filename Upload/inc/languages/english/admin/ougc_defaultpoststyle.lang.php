@@ -26,7 +26,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 $l = [
-    'ougcDefaultPostStyle' => 'OUGC Default Post Style',
+    'ougcDefaultPostStyle' => 'OUGC Default Post Style (Templates)',
     'ougcDefaultPostStyleDescription' => 'Allow users to set a default style for their posts.',
 ];
 
